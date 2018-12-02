@@ -113,4 +113,57 @@ tracker()
 
 _**More Efficient Version**_:
 
+_Condition variable date type_:
+![image](CondDataStructure.png)
+
+```
+/*shared variable*/
+#define MAX 100
+image_type buffer[MAX];
+int bufferavail;
+mutex_type bufferlock;
+thread_cond_type buffer_not_empty;
+thread_cond_type buffer_avail;
+
+digitizer()
+{
+	image_type image;
+	int tail = 0;
+	grad(image);
+	
+	thread_mutex_lock(bufferlock);
+		if (bufferavail == 0) {
+			thread_cond_wait(buffer_avail, bufferlock);
+		}
+	thread_mutex_unlock(bufferlock);
+	
+	buffer[tail] = image;
+	tail = (tail + 1) % MAX;
+	
+	thread_mutex_lock(availock);
+		bufferavail = bufferavail - 1;
+		thread_cond_signal(buffer_not_empty);
+	thread_mutex_unlock(availock);
+}
+
+tracker()
+{
+	image_type image;
+	int head = 0;
+	
+	thread_mutex_lock(bufferlock);
+		if (bufferavail == MAX) {
+			thread_cond_wait(buffer_not_empty, bufferlock);
+		}
+	thread_mutex_unlock(bufferlock);
+	
+	image = buffer[head];
+	head = (head + 1) % MAX;
+	
+	thread_mutex_lock(bufferlock);
+		bufferavail = bufferavail + 1;
+		thread_cond_signal(buffer_avail);
+	thread_mutex_unlock(bufferlock);
+	analyze(image);
+}
 ```
