@@ -167,3 +167,39 @@ tracker()
 	analyze(image);
 }
 ```
+_**Multiple threads call**_:
+
+Multiple threads call use_shared_resourse procedure:
+Need to re-check predicate (ex. res-state == BUSY) to avoid conflict
+
+```
+enum state_t {BUSY, NOT_BUSY} res_state = NOT_BUSY;
+cond_var_type res_not_busy;
+mutex_lock_type cs_mutex;
+
+acquire_shared_resource()
+{
+	thread_mutex_lock(cs_mutex);
+		while (res_state == BUSY) {
+			thread_cond_wait(res_not_busy, cs_mutex);
+		}
+		res_state = BUSY;
+	thread_mutex_unlock(cs_mutex);
+}
+
+release_shared_resource()
+{
+	thread_mutex_lock(cs_mutex);
+		res_state = NOT_BUSY;
+		thread_cond_signal(res_not_busy);
+	thread_mutex_unlock(cs_mutex);
+}
+
+use_shared_resource()
+{
+	acquire_shared_resource();
+		process_resource();
+	release_shared_resource();
+}
+```
+
