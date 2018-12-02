@@ -70,3 +70,47 @@ int main() {
 	thread_join(child_tid);
 }
 ```
+
+Ex, digiterlizer and tracker:
+
+_**Naive Vesion**_:
+
+```
+/*shared variable*/
+#define MAX 100
+image_type buffer[MAX];
+int bufferavail;
+mutex_type availock;
+
+digitizer()
+{
+	image_type image;
+	int tail = 0;
+	grad(image);
+	while (bufferavail == 0)
+		do nothing;
+	buffer[tail] = image;
+	tail = (tail + 1) % MAX;
+	thread_mutex_lock(availock);
+		bufferavail = bufferavail - 1;
+	thread_mutex_unlock(availock);
+}
+
+tracker()
+{
+	image_type image;
+	int head = 0;
+	while (bufferavail == MAX)
+		do nothing;
+	image = buffer[head];
+	head = (head + 1) % MAX;
+	thread_mutex_lock(availock);
+		bufferavail = bufferavail + 1;
+	thread_mutex_unlock(availock);
+	analyze(image);
+}
+```
+
+_**More Efficient Version**_:
+
+```
