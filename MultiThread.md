@@ -264,6 +264,6 @@ tracker()
 ```
 
 Concept Sum Table:
-![image](concept_sum.png)
+![image](Concept_Sum.png)
 
 
