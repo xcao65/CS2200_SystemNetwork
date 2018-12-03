@@ -263,4 +263,7 @@ tracker()
 }
 ```
 
+Concept Sum Table:
+![image](concept_sum.png)
+
 
