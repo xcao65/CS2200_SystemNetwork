@@ -203,3 +203,64 @@ use_shared_resource()
 }
 ```
 
+Modification for digitizer and tracker:
+
+```
+/*shared variable*/
+#define MAX 100
+image_type buffer[MAX];
+int bufferavail;
+mutex_type bufferlock;
+thread_cond_type buffer_not_empty;
+thread_cond_type buffer_avail;
+int head = 0;
+int tail = 0;
+mutex_type headlock;
+mutex_type taillock;
+
+digitizer()
+{
+	image_type image;
+	grad(image);
+	
+	thread_mutex_lock(bufferlock);
+		while (bufferavail == 0) {
+			thread_cond_wait(buffer_avail, bufferlock);
+		}
+	thread_mutex_unlock(bufferlock);
+	
+	thread_mutex_lock(taillock);
+		buffer[tail] = image;
+		tail = (tail + 1) % MAX;
+	thread_mutex_unlock(taillock);
+	
+	thread_mutex_lock(availock);
+		bufferavail = bufferavail - 1;
+		thread_cond_signal(buffer_not_empty);
+	thread_mutex_unlock(availock);
+}
+
+tracker()
+{
+	image_type image;
+	
+	thread_mutex_lock(bufferlock);
+		while (bufferavail == MAX) {
+			thread_cond_wait(buffer_not_empty, bufferlock);
+		}
+	thread_mutex_unlock(bufferlock);
+	
+	thread_mutex_lock(headlock);
+		image = buffer[head];
+		head = (head + 1) % MAX;
+	thread_mutex_unlock(headlock);
+	
+	thread_mutex_lock(bufferlock);
+		bufferavail = bufferavail + 1;
+		thread_cond_signal(buffer_avail);
+	thread_mutex_unlock(bufferlock);
+	analyze(image);
+}
+```
+
+
