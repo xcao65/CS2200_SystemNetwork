@@ -114,7 +114,7 @@ tracker()
 _**More Efficient Version**_:
 
 _Condition variable date type_:
-![image](CondDataStructure.png)
+![image](image/CondDataStructure.png)
 
 ```
 /*shared variable*/
@@ -264,6 +264,11 @@ tracker()
 ```
 
 Concept Sum Table:
-![image](Concept_Sum.png)
+![image](image/Concept_Sum.png)
+
+DeadLock Condition:
+![image](image/DeadLockCond.png)
+DeadLock Prevention:
+![image](image/DeadLockPrevention.png)
 
 
