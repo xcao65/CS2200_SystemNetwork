@@ -271,4 +271,49 @@ DeadLock Condition:
 DeadLock Prevention:
 ![image](image/DeadLockPrevention.png)
 
+_**Dining Philosopher**_:
+
+```
+void philosopher(int i) 
+{	loop {	//forever
+		thinking();
+		DiningPhilosopher.take_fork(i);
+		eating();
+		DiningPhilosopher.put_down_fork(i);
+	}
+}
+
+monitor DiningPhilosopher 
+{
+#define N 5
+#define THINKING 0
+#define hungry 1
+#define eating 2
+#define left (i - 1 + N) mod N
+#define right (i + 1) mod N
+thread_cond_t philosopher_wait[N];
+int philosopher[N];
+
+	void take_fork(int i) 
+	{
+		philosopher_state[i] = hungry;
+		loop
+		{
+			if (philosopher[left] != eating &&
+			 philosopher[right] != eating) {
+			 	philosopher[i] = eating;
+			 } else {
+			 	wait(philosopher_wait[i]);
+			 }
+		} until(philosopher_state[i] != hungry);
+	}
+	
+	void put_down_fork(int i)
+	{
+		philosopher[i] = thinking;
+		notify(philosopher_wait[left]);
+		notify(philosopher_wait[right]);
+	}
+}
+```
 
